@@ -323,13 +323,13 @@ Precedence (from highest to lowest)
 void Program() : {} { Class() <EOF> }
 void Class() : {} {	<CLASS><ID>(<EXTENDS><ID>)?<LBRACKET>(Member())*<RBRACKET>}
 void Member() : {} { Method() | Field()}
-void Method() : {} { }
-void Field() : {} { }
-void Formal() : {} { }
+void Method() : {} { <ID>(<LBRACE><RBRACE>)?<ID><LPAREN>Formal()(<COMMA>Formal())*<RPAREN><LBRACKET>(Stmt())*<RBRACKET> }
+void Field() : {} { <ID>(<LBRACE><RBRACE>)?<ID>(<ASSIGN>Expr())?<SEMICOLON> }
+void Formal() : {} { <ID>(<LBRACE><RBRACE>)?<ID> }
 void Stmt() : {} { ExprStmt() | DeclStmt() | IfStmt() | WhileStmt() | ForStmt() | BreakStmt() | ReturnStmt() | BlockStmt() }
-void ExprStmt() : {} { }
-void DeclStmt() : {} { }
-void IfStmt() : {} { }
+void ExprStmt() : {} { Expr() }
+void DeclStmt() : {} { <ID>(<LBRACE><RBRACE>)?<ID><ASSIGN>Expr()<SEMICOLON> }
+void IfStmt() : {} { <IF><LPAREN>Expr()<RPAREN>Stmt()(<ELSE>Stmt())? }
 void WhileStmt() : {} { <WHILE><LPAREN>Expr()<RPAREN>Stmt() }
 void ForStmt() : {} { <FOR><LPAREN>(Expr())?<SEMICOLON>(Expr())?<SEMICOLON>(Expr())?<RPAREN>Stmt() }
 void BreakStmt() : {} { <BREAK><SEMICOLON> }
@@ -337,10 +337,10 @@ void ReturnStmt() : {} { <RETURN>(Expr())? }
 void BlockStmt() : {} { <LBRACKET>(Stmt())*<RBRACKET> }
 void Expr() : {} { AssignExpr() | DispatchExpr() | NewExpr() | InstanceofExpr() | CastExpr() | BinaryExpr() | UnaryExpr() | ConstExpr() | VarExpr() | <LPAREN>Expr()<RPAREN> }
 void AssignExpr() : {} { VarExpr()<ASSIGN>Expr() }
-void DispatchExpr() : {} { }
-void NewExpr() : {} { }
-void InstanceofExpr() : {} { }
-void CastExpr() : {} { }
+void DispatchExpr() : {} { (Expr()<PERIOD>)?<ID><LPAREN>Expr()(<COMMA>Expr())*<RPAREN> }
+void NewExpr() : {} {  }
+void InstanceofExpr() : {} { Expr()<INSTANCEOF><ID>(<LBRACE><RBRACE>)? }
+void CastExpr() : {} { <LPAREN><ID>(<LBRACE><RBRACE>)?<RPAREN><LPAREN>Expr()<RPAREN> }
 void BinaryExpr() : {} { BinaryArithExpr() | BinaryCompExpr() | BinaryLogicExpr() }
 void UnaryExpr() : {} { UnaryDecrExpr() | UnaryIncrExpr() | UnaryNegExpr() | UnaryNotExpr() }
 void ConstExpr() : {} { <INT_CONST> | <BOOLEAN_CONST> | <STRING_CONST> }
@@ -349,6 +349,6 @@ void BinaryCompExpr() : {} { }
 void BinaryLogicExpr() : {} { }
 void UnaryNegExpr() : {} { <SUB>Expr() }
 void UnaryNotExpr() : {} { <NOT>Expr() }
-void UnaryIncrExpr() : {} { /*2nd prod not left fac*/ }
-void UnaryDecrExpr() : {} { /*2nd prod not left fac*/ }
-void VarExpr() : {} { }
+void UnaryIncrExpr() : {} { <INCREMENT>Expr() | Expr()<INCREMENT> }
+void UnaryDecrExpr() : {} { <DECREMENT>Expr() | Expr()<DECREMENT> }
+void VarExpr() : {} { (Expr()<PERIOD>)?<ID>(<LBRACE>Expr()<RBRACE>)? }
