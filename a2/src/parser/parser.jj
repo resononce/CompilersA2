@@ -344,8 +344,10 @@ void CastExpr() : {} { <LPAREN><ID>(<LBRACE><RBRACE>)?<RPAREN><LPAREN>Expr()<RPA
 void BinaryExpr() : {} { BinaryArithExpr() | BinaryCompExpr() | BinaryLogicExpr() }
 void UnaryExpr() : {} { UnaryDecrExpr() | UnaryIncrExpr() | UnaryNegExpr() | UnaryNotExpr() }
 void ConstExpr() : {} { <INT_CONST> | <BOOLEAN_CONST> | <STRING_CONST> }
-void BinaryArithExpr() : {} { }
-void BinaryCompExpr() : {} { }
+void BinaryArithExpr() : {} {Expr() BAE1() Expr() }
+void BAE1(): {} {<PLUS> | <SUB> | <TIMES> | <DIV> }
+void BinaryCompExpr() : {} {Expr() BCE1() EXPR() }
+void BCE1(): {} {<LT> | <GT> | <LTE> | <GTE> | <ASSIGN>}
 void BinaryLogicExpr() : {} { }
 void UnaryNegExpr() : {} { <SUB>Expr() }
 void UnaryNotExpr() : {} { <NOT>Expr() }
