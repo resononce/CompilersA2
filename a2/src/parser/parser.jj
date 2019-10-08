@@ -153,8 +153,7 @@ TOKEN_MGR_DECLS :
 /******************************************/
 
 
-TOKEN : /* KEYWORDS and SPECIAL SYMBOLS others include brackets/parens/math 
-        symbols/etc */
+TOKEN :
 {
   < CLASS: "class" >
   |
