@@ -318,4 +318,37 @@ Precedence (from highest to lowest)
 
 */
 
-void Program() : {} { <EOF> }
+
+/* Precedence has yet to be handled */
+void Program() : {} { Class() <EOF> }
+void Class() : {} {	<CLASS><ID>(<EXTENDS><ID>)?<LBRACKET>(Member())*<RBRACKET>}
+void Member() : {} { Method() | Field()}
+void Method() : {} { }
+void Field() : {} { }
+void Formal() : {} { }
+void Stmt() : {} { ExprStmt() | DeclStmt() | IfStmt() | WhileStmt() | ForStmt() | BreakStmt() | ReturnStmt() | BlockStmt() }
+void ExprStmt() : {} { }
+void DeclStmt() : {} { }
+void IfStmt() : {} { }
+void WhileStmt() : {} { <WHILE><LPAREN>Expr()<RPAREN>Stmt() }
+void ForStmt() : {} { <FOR><LPAREN>(Expr())?<SEMICOLON>(Expr())?<SEMICOLON>(Expr())?<RPAREN>Stmt() }
+void BreakStmt() : {} { <BREAK><SEMICOLON> }
+void ReturnStmt() : {} { <RETURN>(Expr())? }
+void BlockStmt() : {} { <LBRACKET>(Stmt())*<RBRACKET> }
+void Expr() : {} { }
+void AssignExpr() : {} { }
+void DispatchExpr() : {} { }
+void NewExpr() : {} { }
+void InstanceofExpr() : {} { }
+void CastExpr() : {} { }
+void BinaryExpr() : {} { BinaryArithExpr() | BinaryCompExpr() | BinaryLogicExpr() }
+void UnaryExpr() : {} { UnaryDecrExpr() | UnaryIncrExpr() | UnaryNegExpr() | UnaryNotExpr() }
+void ConstExpr() : {} { <INT_CONST> | <BOOLEAN_CONST> | <STRING_CONST> }
+void BinaryArithExpr() : {} { }
+void BinaryCompExpr() : {} { }
+void BinaryLogicExpr() : {} { }
+void UnaryNegExpr() : {} { <SUB>Expr() }
+void UnaryNotExpr() : {} { <NOT>Expr() }
+void UnaryIncrExpr() : {} { /*2nd prod not left fac*/ }
+void UnaryDecrExpr() : {} { /*2nd prod not left fac*/ }
+void VarExpr() : {} { }
