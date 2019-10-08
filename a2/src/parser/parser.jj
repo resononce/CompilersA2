@@ -348,7 +348,8 @@ void BinaryArithExpr() : {} {Expr() BAE1() Expr() }
 void BAE1(): {} {<PLUS> | <SUB> | <TIMES> | <DIV> }
 void BinaryCompExpr() : {} {Expr() BCE1() EXPR() }
 void BCE1(): {} {<LT> | <GT> | <LTE> | <GTE> | <ASSIGN>}
-void BinaryLogicExpr() : {} { }
+void BinaryLogicExpr() : {} {Expr()BLE1()Expr()}
+void BLE1() : {} {<AND>|<OR>}
 void UnaryNegExpr() : {} { <SUB>Expr() }
 void UnaryNotExpr() : {} { <NOT>Expr() }
 void UnaryIncrExpr() : {} { <INCREMENT>Expr() | Expr()<INCREMENT> }
