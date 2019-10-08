@@ -153,10 +153,149 @@ TOKEN_MGR_DECLS :
 /******************************************/
 
 
+TOKEN : /* KEYWORDS and SPECIAL SYMBOLS others include brackets/parens/math 
+        symbols/etc */
+{
+  < CLASS: "class" >
+  |
+  < EXTENDS: "extends" >
+  |
+  < WHILE: "while" >
+  |
+  < IF: "if" >
+  |
+  < ELSE: "else" >
+  |
+  < FOR: "for" >
+  |
+  < NEW: "new" >
+  |
+  < RETURN: "return" >
+  |
+  < LTE: "<=" >
+  |
+  < GTE: ">=" >
+  |
+  < EQUAL: "==" >
+  |
+  < NOT_EQUAL: "!=" >
+  |
+  < LPAREN: "(" >
+  |
+  < RPAREN: ")" >
+  |
+  < LBRACKET: "{">
+  |
+  < RBRACKET: "}">
+  |
+  < LBRACE: "[">
+  |
+  < RBRACE: "]">
+  |
+  < ASSIGN: "=" >
+  |
+  < PLUS: "+" >
+  |
+  <INCREMENT: "++">
+  |
+  < SUB: "-" >
+  |
+  <DECREMENT: "--">
+  |
+  < DIV: "/" >
+  |
+  < MULTICOMMENT: "/*" >
+    {
+      errorHandler.register(errorHandler.LEX_ERROR,
+                        Lexer.getCurrFilename(),
+                        JavaCharStream.getBeginLine(),
+                        "Unterminated multi-line comment starting with /*");
+    }
+  |
+  < TIMES: "*" >
+  |
+  < LT: "<" >
+  | 
+  < GT: ">" >
+  | 
+  < NOT: "!" >
+  |
+  < MOD: "%" >
+  |
+  < UNSUPPORTED: ("&"|"?"|"@") > 
+    {
+      errorHandler.register(errorHandler.LEX_ERROR,
+                            Lexer.getCurrFilename(),
+                            JavaCharStream.getBeginLine(),
+                            "Unsupported character: "+  image.toString());
+    }
+  | 
+  < SEMICOLON: ";" >
+  |
+  < PERIOD: "." >
+  |
+  < COMMA: "," >
+  |
+  < OR : "||" >
+  |
+  < AND: "&&" >
+  |
+  < SINGLE_QUOTE: "\"" >
+    {
+      errorHandler.register(errorHandler.LEX_ERROR,
+                            Lexer.getCurrFilename(),
+                            JavaCharStream.getBeginLine(),
+                            "Unterminated string starting with \"");
+    }
+  |
+  <BREAK: "break">
+  |
+  <INSTANCEOF: "instanceof">
+  |
+  <SWITCH: "switch">
+}
+
+TOKEN : /* CONSTANTS - FIXME: these three should be fine but look over*/
+{
+  < INT_CONST: (["0"-"9"])+ >
+      {
+        try 
+        {
+          Integer.valueOf(image.toString());
+        } catch (Exception e)
+        {
+          errorHandler.register(errorHandler.LEX_ERROR,
+                                Lexer.getCurrFilename(),
+                                JavaCharStream.getBeginLine(),
+                                "Integer exceeds maximum value allowed: " 
+                                + image.toString());
+        }
+      }
+|
+  < BOOLEAN_CONST: ("false" | "true") >
+|
+  < STRING_CONST: "\"" (~["\\","\""] | "\\"~[" "] | "\\ ")*"\"">
+}
+
+TOKEN: /* IDs - FIXME: broken, only match "Boo"
+       includes "void" "main" class names etc.*/
+{
+  < ID: ["A"-"Z","a"-"z"](["a"-"z","A"-"Z","0"-"9","_"])* >
+}
+
+<*> 
+SKIP: {
+  < " " | "\t" | "\r" | "\n" | "\r\n" >
+  | 
+  <"//" (~["\n","\r"])* ("\n"|"\r"|"\r\n") >
+  | 
+  <"/*" ((~[" "]) | ([" "]))* "*/" >
+}
+
 <*>
 TOKEN : /* EOF */
 {
-  <EOF>
+  <EOF> { errorHandler.checkErrors(); }
 }
 
 /******************************************/
