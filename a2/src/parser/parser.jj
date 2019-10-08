@@ -335,8 +335,8 @@ void ForStmt() : {} { <FOR><LPAREN>(Expr())?<SEMICOLON>(Expr())?<SEMICOLON>(Expr
 void BreakStmt() : {} { <BREAK><SEMICOLON> }
 void ReturnStmt() : {} { <RETURN>(Expr())? }
 void BlockStmt() : {} { <LBRACKET>(Stmt())*<RBRACKET> }
-void Expr() : {} { }
-void AssignExpr() : {} { }
+void Expr() : {} { AssignExpr() | DispatchExpr() | NewExpr() | InstanceofExpr() | CastExpr() | BinaryExpr() | UnaryExpr() | ConstExpr() | VarExpr() | <LPAREN>Expr()<RPAREN> }
+void AssignExpr() : {} { VarExpr()<ASSIGN>Expr() }
 void DispatchExpr() : {} { }
 void NewExpr() : {} { }
 void InstanceofExpr() : {} { }
