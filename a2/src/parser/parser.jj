@@ -350,16 +350,18 @@ void ReturnStmt() : {} { <RETURN>(Expr())? }
 
 void BlockStmt() : {} { <LBRACKET>(Stmt())*<RBRACKET> }
 
-void Expr() : {} { AssignExpr() 
-                  | DispatchExpr() 
+void Expr() : {} { AssignExpr() //lr
+                  | DispatchExpr() //lr
                   | NewExpr() 
-                  | InstanceofExpr() 
+                  | InstanceofExpr() //lr
                   | CastExpr() 
-                  | BinaryExpr() 
-                  | UnaryExpr() 
+                  | BinaryExpr() //lr
+                  | UnaryExpr() //lr
                   | ConstExpr() 
-                  | VarExpr() 
+                  | VarExpr() //lr
                   | <LPAREN>Expr()<RPAREN> }
+
+void Expr2() : {} {  }
 
 void AssignExpr() : {} { VarExpr()<ASSIGN>Expr()}
 
