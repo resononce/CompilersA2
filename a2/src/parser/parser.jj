@@ -361,9 +361,10 @@ void Expr() : {} { AssignExpr()
                   | VarExpr() 
                   | <LPAREN>Expr()<RPAREN> }
 
-void AssignExpr() : {} { AssignExpr1() }
+void AssignExpr() : {} { VarExpr()<ASSIGN>Expr()}
 
-void AssignExpr1() : {} { <ASSIGN>Expr()VarExpr() | null }
+void VarExpr() : {} { <ID>(<LBRACE>Expr()<RBRACE>)? 
+                    | Expr()<PERIOD><ID>(<LBRACE>Expr()<RBRACE>)?}
 
 void DispatchExpr() : {} { (Expr()<PERIOD>)?<ID><LPAREN>Expr()(<COMMA>Expr())*<RPAREN> }
 
