@@ -372,9 +372,9 @@ void VarExpr1() : {} {<PERIOD>Expr()
                     | <PERIOD><ID>(<LBRACE>Expr()<RBRACE>)?}
 
 void DispatchExpr() : {} { <ID><LPAREN>Expr()(<COMMA>Expr())*<RPAREN> 
-                          |ConstExpr()DispatchExpr1()
-                          |CastExpr()DispatchExpr1()
-                          |NewExpr()DispatchExpr1()
+                          | ConstExpr()DispatchExpr1()
+                          | CastExpr()DispatchExpr1()
+                          | NewExpr()DispatchExpr1()
                         }
 void DispatchExpr1() : {} {<PERIOD>Expr()
                         | <PERIOD><ID><LPAREN>Expr()(<COMMA>Expr())*<RPAREN>}
@@ -384,7 +384,11 @@ void NewExpr() : {} { <NEW><ID>NewExpr1() }
 void NewExpr1() : {} { <LPAREN><RPAREN> 
                       | <LBRACE>Expr()<RBRACE> }
 
-void InstanceofExpr() : {} { Expr()<INSTANCEOF><ID>(<LBRACE><RBRACE>)? }
+void InstanceofExpr() : {} { CastExpr()InstanceofExpr1() 
+                            |ConstExpr()InstanceofExpr1()
+                            |NewExpr()InstanceofExpr1()}
+void InstanceofExpr1() : {} {<INSTANCEOF><ID>(<LBRACE><RBRACE>)?Expr()
+                            |<INSTANCEOF><ID>(<LBRACE><RBRACE>)?}
 
 void CastExpr() : {} { <LPAREN><ID>(<LBRACE><RBRACE>)?<RPAREN><LPAREN>Expr()<RPAREN> }
 
@@ -409,7 +413,7 @@ void BAE2() : {} { <TIMES> | <DIV> | <MOD> }
 
 void BinaryCompExpr() : {} { Expr()BCE1()Expr() }
 
-void BCE1() : {} { <EQUAL> 
+void BCE1() : {} {  <EQUAL> 
                   | <NOT_EQUAL> 
                   | <LT> 
                   | <LTE> 
@@ -419,7 +423,7 @@ void BCE1() : {} { <EQUAL>
 void BinaryLogicExpr() : {} { Expr()BLE1()Expr() }
 
 void BLE1() : {} { <AND> 
-                  | <OR> }
+                 | <OR> }
 
 void UnaryNegExpr() : {} { <SUB>Expr() }
 
