@@ -384,11 +384,20 @@ void NewExpr() : {} { <NEW><ID>NewExpr1() }
 void NewExpr1() : {} { <LPAREN><RPAREN> 
                       | <LBRACE>Expr()<RBRACE> }
 
+<<<<<<< Updated upstream
 void InstanceofExpr() : {} { CastExpr()InstanceofExpr1() 
                             |ConstExpr()InstanceofExpr1()
                             |NewExpr()InstanceofExpr1()}
 void InstanceofExpr1() : {} {<INSTANCEOF><ID>(<LBRACE><RBRACE>)?Expr()
                             |<INSTANCEOF><ID>(<LBRACE><RBRACE>)?}
+=======
+void InstanceofExpr() : {} { ConstExpr()DispatchExpr1()
+                           | CastExpr()DispatchExpr1()
+                           | NewExpr()DispatchExpr1() }
+
+void InstanceofExpr1() : {} { <INSTANCEOF><ID>(<LBRACE><RBRACE>)?Expr()
+                            | <INSTANCEOF><ID>(<LBRACE><RBRACE>)? }
+>>>>>>> Stashed changes
 
 void CastExpr() : {} { <LPAREN><ID>(<LBRACE><RBRACE>)?<RPAREN><LPAREN>Expr()<RPAREN> }
 
