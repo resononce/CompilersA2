@@ -350,7 +350,7 @@ void ReturnStmt() : {} { <RETURN>(Expr())? }
 
 void BlockStmt() : {} { <LBRACKET>(Stmt())*<RBRACKET> }
 
-void Expr() : {} { AssignExpr() //lr
+void Expr() : {} { AssignExpr()  //lr
                   | DispatchExpr() //lr
                   | NewExpr() 
                   | InstanceofExpr() //lr
@@ -361,12 +361,15 @@ void Expr() : {} { AssignExpr() //lr
                   | VarExpr() //lr
                   | <LPAREN>Expr()<RPAREN> }
 
-void Expr2() : {} {  }
-
 void AssignExpr() : {} { VarExpr()<ASSIGN>Expr()}
 
 void VarExpr() : {} { <ID>(<LBRACE>Expr()<RBRACE>)? 
-                    | Expr()<PERIOD><ID>(<LBRACE>Expr()<RBRACE>)?}
+                    | ConstExpr()VarExpr1()
+                    | CastExpr()VarExpr1()
+                    | NewExpr()VarExpr1()}
+
+void VarExpr1() : {} {<PERIOD>Expr()
+                    | <PERIOD><ID>(<LBRACE>Expr()<RBRACE>)?}
 
 void DispatchExpr() : {} { (Expr()<PERIOD>)?<ID><LPAREN>Expr()(<COMMA>Expr())*<RPAREN> }
 
