@@ -352,7 +352,9 @@ void BlockStmt() : {} { <LBRACKET>(Stmt())*<RBRACKET> }
 
 void Expr() : {} { AssignExpr() | DispatchExpr() | NewExpr() | InstanceofExpr() | CastExpr() | BinaryExpr() | UnaryExpr() | ConstExpr() | VarExpr() | <LPAREN>Expr()<RPAREN> }
 
-void AssignExpr() : {} { VarExpr()<ASSIGN>Expr() }
+void AssignExpr() : {} { AssignExpr1() }
+
+void AssignExpr1() : {} { <ASSIGN>Expr()VarExpr() | null }
 
 void DispatchExpr() : {} { (Expr()<PERIOD>)?<ID><LPAREN>Expr()(<COMMA>Expr())*<RPAREN> }
 
@@ -372,7 +374,9 @@ void ConstExpr() : {} { <INT_CONST> | <BOOLEAN_CONST> | <STRING_CONST> }
 
 void BinaryArithExpr() : {} { Expr()BAE1()Expr() }
 
-void BAE1() : {} { <PLUS> | <SUB> | <TIMES> | <DIV> | <MOD> }
+void BAE1() : {} { <PLUS> | <SUB> | BAE2() }
+
+void BAE2() : {} { <TIMES> | <DIV> | <MOD> }
 
 void BinaryCompExpr() : {} { Expr()BCE1()Expr() }
 
