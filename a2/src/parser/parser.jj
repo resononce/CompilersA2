@@ -419,12 +419,14 @@ void BinaryArithExpr1() : {} {ConstExpr()
 
 void BinaryCompExpr() : {} { Expr()BCE1()Expr() }
 
-void BCE1() : {} {  <EQUAL> 
-                  | <NOT_EQUAL> 
-                  | <LT> 
+void BCE1() : {} {  BCE2() 
+                  | <EQUAL> 
+                  | <NOT_EQUAL> }
+
+void BCE2() : {} { <LT> 
                   | <LTE> 
                   | <GT> 
-                  | <GTE> }
+                  | <GTE>  }
 
 void BinaryLogicExpr() : {} { Expr()BLE1()Expr() }
 
