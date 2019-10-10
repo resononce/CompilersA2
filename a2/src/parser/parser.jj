@@ -324,21 +324,32 @@ void Program() : {} { Class() <EOF> }
 
 void Class() : {} {	<CLASS><ID>(<EXTENDS><ID>)?<LBRACKET>(Member())*<RBRACKET>}
 
-void Member() : {} { Method() | Field()}
+void Member() : {} {Formal()(Method() | Field())}
 
-void Method() : {} { <ID>(<LBRACE><RBRACE>)?<ID><LPAREN>Formal()(<COMMA>Formal())*<RPAREN><LBRACKET>(Stmt())*<RBRACKET> }
+void Method() : {} { <LPAREN>Formal()(<COMMA>Formal())*<RPAREN><LBRACKET>(Stmt())*<RBRACKET> }
 
-void Field() : {} { <ID>(<LBRACE><RBRACE>)?<ID>(<ASSIGN>Expr())?<SEMICOLON> }
+void Field() : {} { (<ASSIGN>Expr())?<SEMICOLON> }
 
 void Formal() : {} { <ID>(<LBRACE><RBRACE>)?<ID> }
 
-void Stmt() : {} { ExprStmt() | DeclStmt() | IfStmt() | WhileStmt() | ForStmt() | BreakStmt() | ReturnStmt() | BlockStmt() }
+void Stmt() : {} { LOOKAHEAD(3)ExprStmt() 
+                  | DeclStmt() 
+                  | IfStmt() 
+                  | WhileStmt() 
+                  | ForStmt() 
+                  | BreakStmt() 
+                  | ReturnStmt() 
+                  | BlockStmt() }
 
 void ExprStmt() : {} { Expr() }
 
-void DeclStmt() : {} { <ID>(<LBRACE><RBRACE>)?<ID><ASSIGN>Expr()<SEMICOLON> }
+void DeclStmt() : {} { Formal()<ASSIGN>Expr()<SEMICOLON> }
 
-void IfStmt() : {} { <IF><LPAREN>Expr()<RPAREN>Stmt()(<ELSE>Stmt())? }
+void IfStmt() : {} { <IF><LPAREN>Expr()<RPAREN>Stmt()optionalelse()} //(<ELSE>Stmt())?
+
+void optionalelse() : {} {<ELSE>Stmt()
+                          | /* epsilon */{}}
+
 
 void WhileStmt() : {} { <WHILE><LPAREN>Expr()<RPAREN>Stmt() }
 
@@ -346,7 +357,7 @@ void ForStmt() : {} { <FOR><LPAREN>(Expr())?<SEMICOLON>(Expr())?<SEMICOLON>(Expr
 
 void BreakStmt() : {} { <BREAK><SEMICOLON> }
 
-void ReturnStmt() : {} { <RETURN>(Expr())? }
+void ReturnStmt() : {} { <RETURN>(LOOKAHEAD(2)Expr())? }
 
 void BlockStmt() : {} { <LBRACKET>(Stmt())*<RBRACKET> }
 
@@ -361,21 +372,15 @@ void Expr() : {} { AssignExpr()  //lr
                   | VarExpr() //lr
                   | <LPAREN>Expr()<RPAREN> }
 
-void AssignExpr() : {} { VarExpr()<ASSIGN>Expr()}
+void AssignExpr() : {} { VarExpr()<ASSIGN>Expr() | BasicExp()VarExpr()<ASSIGN>Expr()}
 
-void VarExpr() : {} { <ID>(<LBRACE>Expr()<RBRACE>)? 
-                    | ConstExpr()VarExpr1()
-                    | CastExpr()VarExpr1()
-                    | NewExpr()VarExpr1()}
+void VarExpr() : {} { VarExpr1()|<ID>(<LBRACE>Expr()<RBRACE>)? }
 
 void VarExpr1() : {} {<PERIOD>Expr()
                     | <PERIOD><ID>(<LBRACE>Expr()<RBRACE>)?}
 
-void DispatchExpr() : {} { <ID><LPAREN>Expr()(<COMMA>Expr())*<RPAREN> 
-                          | ConstExpr()DispatchExpr1()
-                          | CastExpr()DispatchExpr1()
-                          | NewExpr()DispatchExpr1()
-                        }
+void DispatchExpr() : {} { BasicExp()DispatchExpr1()|<ID><LPAREN>Expr()(<COMMA>Expr())*<RPAREN> }
+
 void DispatchExpr1() : {} {<PERIOD>Expr()
                         | <PERIOD><ID><LPAREN>Expr()(<COMMA>Expr())*<RPAREN>}
 
@@ -384,14 +389,14 @@ void NewExpr() : {} { <NEW><ID>NewExpr1() }
 void NewExpr1() : {} { <LPAREN><RPAREN> 
                       | <LBRACE>Expr()<RBRACE> }
 
-void InstanceofExpr() : {} { CastExpr()InstanceofExpr1() 
-                            |ConstExpr()InstanceofExpr1()
-                            |NewExpr()InstanceofExpr1()}
+void InstanceofExpr() : {} { BasicExp()<INSTANCEOF>InstanceofExpr1() }
 
-void InstanceofExpr1() : {} {<INSTANCEOF><ID>(<LBRACE><RBRACE>)?Expr()
-                            |<INSTANCEOF><ID>(<LBRACE><RBRACE>)?}
+void InstanceofExpr1() : {} {<ID>(<LBRACE><RBRACE>)?Expr()
+                            |<ID>(<LBRACE><RBRACE>)?}
 
-void CastExpr() : {} { <LPAREN><ID>(<LBRACE><RBRACE>)?<RPAREN><LPAREN>Expr()<RPAREN> }
+void CastExpr() : {} { <LPAREN><ID>LOOKAHEAD(2)CastExpr1()  }
+void CastExpr1() : {} { <LBRACE><RBRACE><RPAREN><LPAREN>Expr()<RPAREN> |
+                        <RPAREN><LPAREN>Expr()<RPAREN>}
 
 void BinaryExpr() : {} { BinaryArithExpr() 
                         | BinaryCompExpr() 
@@ -406,35 +411,29 @@ void ConstExpr() : {} { <INT_CONST>
                       | <BOOLEAN_CONST> 
                       | <STRING_CONST> }
 
-void BinaryArithExpr() : {} { (BinaryArithExpr1()<PLUS>)+Expr() 
-                              |(BinaryArithExpr1()<SUB>)+Expr() 
+void BinaryArithExpr() : {} { (BasicExp()<PLUS>)+Expr() 
+                              |(BasicExp()<SUB>)+Expr() 
                               | BinaryArithExpr2()} //Expr()BAE1()Expr()
-void BinaryArithExpr2() : {} {(BinaryArithExpr1()<TIMES>)+Expr()
-                              |(BinaryArithExpr1()<DIV>)+Expr()
-                              |(BinaryArithExpr1()<MOD>)+Expr()
+void BinaryArithExpr2() : {} {(BasicExp()<TIMES>)+Expr()
+                              |(BasicExp()<DIV>)+Expr()
+                              |(BasicExp()<MOD>)+Expr()
                               }
-void BinaryArithExpr1() : {} {ConstExpr()
-                             |CastExpr()
-                             |NewExpr()}
 
-void BinaryCompExpr() : {} { (BinaryCompExpr1()<EQUAL>)+Expr() 
-                            |(BinaryCompExpr1()<NOT_EQUAL>)+Expr() 
+
+void BinaryCompExpr() : {} { (BasicExp()<EQUAL>)+Expr() 
+                            |(BasicExp()<NOT_EQUAL>)+Expr() 
                             |BinaryCompExpr2()}
 
-void BinaryCompExpr2() : {} { (BinaryCompExpr1()<LT>)+Expr() 
-                            |(BinaryCompExpr1()<LTE>)+Expr()
-                            |(BinaryCompExpr1()<GT>)+Expr()
-                            |(BinaryCompExpr1()<GTE>)+Expr()}
+void BinaryCompExpr2() : {} { (BasicExp()<LT>)+Expr() 
+                            |(BasicExp()<LTE>)+Expr()
+                            |(BasicExp()<GT>)+Expr()
+                            |(BasicExp()<GTE>)+Expr()}
 
-void BinaryCompExpr1() : {} {ConstExpr()
-                             |CastExpr()
-                             |NewExpr()}
-
-void BinaryLogicExpr() : {} { (BinaryLogicExpr1()<AND>)+Expr() 
+void BinaryLogicExpr() : {} { (BasicExp()<AND>)+Expr() 
                               |BinaryLogicExpr2()}
-void BinaryLogicExpr2() : {} { (BinaryLogicExpr1()<OR>)+Expr()}                              
+void BinaryLogicExpr2() : {} { (BasicExp()<OR>)+Expr()}                              
 
-void BinaryLogicExpr1() : {} { ConstExpr()
+void BasicExp() : {} { ConstExpr()
                               |CastExpr() 
                               |NewExpr()}
 
@@ -443,8 +442,7 @@ void UnaryNegExpr() : {} { <SUB>Expr() }
 void UnaryNotExpr() : {} { <NOT>Expr() }
 
 void UnaryIncrExpr() : {} { <INCREMENT>Expr() 
-                          | (ConstExpr() | CastExpr() | NewExpr())<INCREMENT> }
-
+                           | (ConstExpr() | CastExpr() | NewExpr())<INCREMENT> }
 void UnaryDecrExpr() : {} { <DECREMENT>Expr() 
                           | (ConstExpr() | CastExpr() | NewExpr())<DECREMENT> }
 
