@@ -406,11 +406,16 @@ void ConstExpr() : {} { <INT_CONST>
                       | <BOOLEAN_CONST> 
                       | <STRING_CONST> }
 
-void BinaryArithExpr() : {} { Expr()BAE1()Expr() }
-
-void BAE1() : {} { <PLUS> | <SUB> | BAE2() }
-
-void BAE2() : {} { <TIMES> | <DIV> | <MOD> }
+void BinaryArithExpr() : {} { (BinaryArithExpr1()<PLUS>)+Expr() 
+                              |(BinaryArithExpr1()<SUB>)+Expr() 
+                              | BinaryArithExpr2()} //Expr()BAE1()Expr()
+void BinaryArithExpr2() : {} {(BinaryArithExpr1()<TIMES>)+Expr()
+                              |(BinaryArithExpr1()<DIV>)+Expr()
+                              |(BinaryArithExpr1()<MOD>)+Expr()
+                              }
+void BinaryArithExpr1() : {} {ConstExpr()
+                             |CastExpr()
+                             |NewExpr()}
 
 void BinaryCompExpr() : {} { Expr()BCE1()Expr() }
 
