@@ -324,21 +324,32 @@ void Program() : {} { Class() <EOF> }
 
 void Class() : {} {	<CLASS><ID>(<EXTENDS><ID>)?<LBRACKET>(Member())*<RBRACKET>}
 
-void Member() : {} { Method() | Field()}
+void Member() : {} {Formal()(Method() | Field())}
 
-void Method() : {} { <ID>(<LBRACE><RBRACE>)?<ID><LPAREN>Formal()(<COMMA>Formal())*<RPAREN><LBRACKET>(Stmt())*<RBRACKET> }
+void Method() : {} { <LPAREN>Formal()(<COMMA>Formal())*<RPAREN><LBRACKET>(Stmt())*<RBRACKET> }
 
-void Field() : {} { <ID>(<LBRACE><RBRACE>)?<ID>(<ASSIGN>Expr())?<SEMICOLON> }
+void Field() : {} { (<ASSIGN>Expr())?<SEMICOLON> }
 
 void Formal() : {} { <ID>(<LBRACE><RBRACE>)?<ID> }
 
-void Stmt() : {} { ExprStmt() | DeclStmt() | IfStmt() | WhileStmt() | ForStmt() | BreakStmt() | ReturnStmt() | BlockStmt() }
+void Stmt() : {} { ExprStmt() 
+                  | DeclStmt() 
+                  | IfStmt() 
+                  | WhileStmt() 
+                  | ForStmt() 
+                  | BreakStmt() 
+                  | ReturnStmt() 
+                  | BlockStmt() }
 
 void ExprStmt() : {} { Expr() }
 
-void DeclStmt() : {} { <ID>(<LBRACE><RBRACE>)?<ID><ASSIGN>Expr()<SEMICOLON> }
+void DeclStmt() : {} { Formal()<ASSIGN>Expr()<SEMICOLON> }
 
-void IfStmt() : {} { <IF><LPAREN>Expr()<RPAREN>Stmt()(<ELSE>Stmt())? }
+void IfStmt() : {} { <IF><LPAREN>Expr()<RPAREN>Stmt()optionalelse()} //(<ELSE>Stmt())?
+
+void optionalelse() : {} {<ELSE>Stmt()
+                          | /* epsilon */{}}
+
 
 void WhileStmt() : {} { <WHILE><LPAREN>Expr()<RPAREN>Stmt() }
 
@@ -443,8 +454,7 @@ void UnaryNegExpr() : {} { <SUB>Expr() }
 void UnaryNotExpr() : {} { <NOT>Expr() }
 
 void UnaryIncrExpr() : {} { <INCREMENT>Expr() 
-                          | Expr()<INCREMENT> }
-
+                           | (ConstExpr() | CastExpr() | NewExpr())<INCREMENT> }
 void UnaryDecrExpr() : {} { <DECREMENT>Expr() 
-                          | Expr()<DECREMENT> }
+                          | (ConstExpr() | CastExpr() | NewExpr())<DECREMENT> }
 
