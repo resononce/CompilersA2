@@ -438,8 +438,8 @@ void UnaryNegExpr() : {} { <SUB>Expr() }
 void UnaryNotExpr() : {} { <NOT>Expr() }
 
 void UnaryIncrExpr() : {} { <INCREMENT>Expr() 
-                          | Expr()<INCREMENT> }
+                          | (ConstExpr() | CastExpr() | NewExpr())<INCREMENT> }
 
 void UnaryDecrExpr() : {} { <DECREMENT>Expr() 
-                          | Expr()<DECREMENT> }
+                          | (ConstExpr() | CastExpr() | NewExpr())<DECREMENT> }
 
