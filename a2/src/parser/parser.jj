@@ -417,21 +417,26 @@ void BinaryArithExpr1() : {} {ConstExpr()
                              |CastExpr()
                              |NewExpr()}
 
-void BinaryCompExpr() : {} { Expr()BCE1()Expr() }
+void BinaryCompExpr() : {} { (BinaryCompExpr1()<EQUAL>)+Expr() 
+                            |(BinaryCompExpr1()<NOT_EQUAL>)+Expr() 
+                            |BinaryCompExpr2()}
 
-void BCE1() : {} {  BCE2() 
-                  | <EQUAL> 
-                  | <NOT_EQUAL> }
+void BinaryCompExpr2() : {} { (BinaryCompExpr1()<LT>)+Expr() 
+                            |(BinaryCompExpr1()<LTE>)+Expr()
+                            |(BinaryCompExpr1()<GT>)+Expr()
+                            |(BinaryCompExpr1()<GTE>)+Expr()}
 
-void BCE2() : {} { <LT> 
-                  | <LTE> 
-                  | <GT> 
-                  | <GTE>  }
+void BinaryCompExpr1() : {} {ConstExpr()
+                             |CastExpr()
+                             |NewExpr()}
 
-void BinaryLogicExpr() : {} { Expr()BLE1()Expr() }
+void BinaryLogicExpr() : {} { (BinaryLogicExpr1()<AND>)+Expr() 
+                              |BinaryLogicExpr2()}
+void BinaryLogicExpr2() : {} { (BinaryLogicExpr1()<OR>)+Expr()}                              
 
-void BLE1() : {} { <AND> 
-                 | <OR> }
+void BinaryLogicExpr1() : {} { ConstExpr()
+                              |CastExpr() 
+                              |NewExpr()}
 
 void UnaryNegExpr() : {} { <SUB>Expr() }
 
